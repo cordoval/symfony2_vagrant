@@ -1,0 +1,80 @@
+server {
+  listen 80;
+ 
+  server_name localhost;
+  root /var/www/apps;
+ 
+  error_log /var/log/nginx/symfony2.error.log;
+  access_log /var/log/nginx/symfony2.access.log;
+ 
+  location / {
+    index app.php;
+    if (-f $request_filename) {
+      break;
+    }
+    rewrite ^(.*)$ /app.php last;
+  }
+ 
+  # pass the PHP scripts to FastCGI server listening on 127.0.0.1:9000
+  #
+  location ~ (app|app_dev).php {
+    include fastcgi_params;
+    fastcgi_split_path_info ^(.+\.php)(/.+)$;
+    fastcgi_param PATH_INFO $fastcgi_path_info;
+    fastcgi_param PATH_TRANSLATED $document_root$fastcgi_path_info;
+    fastcgi_param HTTPS off;
+    fastcgi_pass   127.0.0.1:9000;
+  }
+
+  # Remove this entire block prior to going live
+  # This is solely to allow you to view the PHP configuration
+  # and to configure your Symfony2 parameters.ini
+  location ~ (phpinfo|config).php {
+    include fastcgi_params;
+    fastcgi_split_path_info ^(.+\.php)(/.+)$;
+    fastcgi_param PATH_INFO $fastcgi_path_info;
+    fastcgi_param PATH_TRANSLATED $document_root$fastcgi_path_info;
+    fastcgi_param HTTPS off;
+    fastcgi_pass   127.0.0.1:9000;
+  }
+  # Remove to here
+}
+ 
+server {
+  listen 443;
+ 
+  server_name localhost;
+  root /var/www/apps;
+ 
+  ssl on;
+  ssl_certificate      /etc/ssl/certs/ssl-cert-snakeoil.pem;
+  ssl_certificate_key  /etc/ssl/private/ssl-cert-snakeoil.key;
+
+  ssl_session_timeout 5m;
+       
+  ssl_protocols SSLv3 TLSv1;
+  ssl_ciphers ALL:!ADH:!EXPORT56:RC4+RSA:+HIGH:+MEDIUM:+LOW:+SSLv3:+EXP;
+  ssl_prefer_server_ciphers on;
+ 
+  error_log /var/log/nginx/symfony2.error.log;
+  access_log /var/log/nginx/symfony2.access.log;
+ 
+  location / {
+    index app.php;
+    if (-f $request_filename) {
+      break;
+    }
+    rewrite ^(.*)$ /app.php last;
+  }
+ 
+  # pass the PHP scripts to FastCGI server listening on 127.0.0.1:9000
+  #
+  location ~ (app|app_dev).php {
+    include fastcgi_params;
+    fastcgi_split_path_info ^(.+\.php)(/.+)$;
+    fastcgi_param PATH_INFO $fastcgi_path_info;
+    fastcgi_param PATH_TRANSLATED $document_root$fastcgi_path_info;
+    fastcgi_param HTTPS on;
+    fastcgi_pass   127.0.0.1:9000;
+  }
+}
