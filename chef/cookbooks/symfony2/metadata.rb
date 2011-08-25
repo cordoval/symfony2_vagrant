@@ -12,3 +12,8 @@ recipe            "symfony2::debug", "Installs base Symfony2 server with Xdebug"
 %w{ ubuntu debian }.each do |os|
   supports os
 end
+
+attribute "php/timezone",
+  :display_name => "PHP Timezone",
+  :description => "Defines the default timezone used by the date functions",
+  :default => "Europe/Dublin"

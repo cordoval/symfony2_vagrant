@@ -22,13 +22,24 @@ package "php5-intl"
 package "php5-sqlite"
 package "php5-apc"
 
-# For snakeoil certs
+# For snakeoil certs (default SSL site)
 package "ssl-cert"
 
 package "git"
 
 # needed to set ACLs on the app/cache and app/log directories
 package "acl"
+
+# Define our services
+service "nginx" do
+  supports :status => true, :restart => true, :reload => true
+  action [ :enable, :start ]
+end
+
+service "php5-fpm" do
+  supports :status => true, :restart => true, :reload => true
+  action [ :enable, :start ]
+end
 
 # Create the apps directory
 directory "/var/www/apps" do
@@ -63,12 +74,20 @@ cookbook_file "/var/www/apps/phpinfo.php" do
   mode "0644"
 end
 
-service "nginx" do
-  supports :status => true, :restart => true, :reload => true
-  action [ :enable, :start ]
+# Create the php.ini file for PHP-FPM
+template "/etc/php5/fpm/php.ini" do
+  source "php-fpm.ini.erb"
+  owner "root"
+  group "root"
+  mode 0644
+  notifies :restart, resources("service[php5-fpm]"), :delayed
 end
 
-service "php5-fpm" do
-  supports :status => true, :restart => true, :reload => true
-  action [ :enable, :start ]
+# Create the php.ini file for command line (cli) use
+template "/etc/php5/cli/php.ini" do
+  source "php-cli.ini.erb"
+  owner "root"
+  group "root"
+  mode 0644
 end
+
