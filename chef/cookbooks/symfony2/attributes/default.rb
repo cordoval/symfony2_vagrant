@@ -1,0 +1,1 @@
+default[:php][:timezone] = "Europe/Dublin"
