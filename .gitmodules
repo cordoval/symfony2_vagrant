@@ -1,0 +1,3 @@
+[submodule "chef/cookbooks/dotdeb"]
+	path = chef/cookbooks/dotdeb
+	url = https://github.com/yeevgen/cookbook-dotdeb.git
